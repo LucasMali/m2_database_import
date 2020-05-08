@@ -1,0 +1,9 @@
+dist: trusty
+language: generic
+addons:
+    sonarcloud:
+      organization: "lucasmaliszewski"
+      token: $SONAR_TOKEN
+
+script:
+    - sonar-scanner
