@@ -48,6 +48,8 @@ update_config() {
         --admin-lastname="Admin" \
         --admin-email="${ADMIN_EMAIL}"
     printf "u: %s\np: %s\n" "${ADMIN_USER}" "${ADMIN_PASS}"
+   
+    php ${WEB_ROOT}bin/magento dev:source_theme:deploy
   fi
 
  php ${WEB_ROOT}bin/magento s:up
