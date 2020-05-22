@@ -7,7 +7,12 @@ backup_local() {
     echo "Creating backup folder"
     mkdir -p $(pwd)/backups
   fi
-  mysqldump -h ${LOCALDBHOST} -u ${LOCALDBUSER} --single-transaction ${LOCALDB} | sed -e 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/' | gzip > $(pwd)/backups/local.sql.gz
+
+  if [ -z "$LOCALDBPASS" ]; then
+    mysqldump -h ${LOCALDBHOST} -u ${LOCALDBUSER} --single-transaction ${LOCALDB} | sed -e 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/' | gzip > $(pwd)/backups/local.sql.gz
+  else
+    mysqldump -h ${LOCALDBHOST} -u ${LOCALDBUSER} -p${LOCALDBPASS} --single-transaction ${LOCALDB} | sed -e 's/DEFINER[ ]*=[ ]*[^*]*\*/\*/' | gzip > $(pwd)/backups/local.sql.gz
+  fi
 }
 
 get_production_db() {
@@ -23,7 +28,11 @@ get_production_db() {
 import_db() {
   if test -f $(pwd)/incoming/${DBFILE}; then
     echo "Importing production DB into local"
-    pv $(pwd)/incoming/${DBFILE} | zcat | mysql -h ${LOCALDBHOST} -u ${LOCALDBUSER} ${LOCALDB}
+    if [ -z "$LOCALDBPASS" ]; then
+      pv $(pwd)/incoming/${DBFILE} | zcat | mysql -h ${LOCALDBHOST} -u ${LOCALDBUSER} ${LOCALDB}
+    else
+      pv $(pwd)/incoming/${DBFILE} | zcat | mysql -h ${LOCALDBHOST} -u ${LOCALDBUSER} -p${LOCALDBPASS} ${LOCALDB}
+    fi
   fi
 }
 
