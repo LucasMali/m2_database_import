@@ -75,6 +75,7 @@ load_config() {
 }
 
 # The script starts here
+cd $(dirname $(realpath ${BASH_SOURCE[0]}))
 load_config
 backup_local
 get_production_db
