@@ -53,8 +53,26 @@ function no_security() {
     php ${WEB_ROOT}bin/magento config:set --lock-env msp_securitysuite_recaptcha/backend/enabled  0
 }
 
+function sign_static() {
+  echo "Turning off signed public static files."
+    php ${WEB_ROOT}bin/magento config:set --lock-env dev/static/sign 0
+}
+
+function secure_url() {
+  VAL=0
+  echo ${SECUREURLS}
+  if [ ! -z ${SECUREURLS} ] && [ ${SECUREURLS} == "true" ]; then
+    VAL=1
+  fi
+    echo "Setting use of secure URLS to ${VAL}"
+
+  php ${WEB_ROOT}bin/magento config:set --lock-env web/secure/use_in_adminhtml $VAL
+  php ${WEB_ROOT}bin/magento config:set --lock-env web/secure/use_in_frontend $VAL
+}
 
 set_payment_sandbox
 set_no_emails
 set_website_and_store_urls
 no_security
+# sign_static
+secure_url

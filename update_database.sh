@@ -57,13 +57,7 @@ update_config() {
         --admin-lastname="Admin" \
         --admin-email="${ADMIN_EMAIL}"
     printf "u: %s\np: %s\n" "${ADMIN_USER}" "${ADMIN_PASS}"
-   
-    php ${WEB_ROOT}bin/magento dev:source_theme:deploy
   fi
-
- php ${WEB_ROOT}bin/magento s:up
- php ${WEB_ROOT}bin/magento setup:di:compile
- php ${WEB_ROOT}bin/magento indexer:reindex
 }
 
 load_config() {
@@ -74,11 +68,30 @@ load_config() {
   set +o allexport
 }
 
+build_static_files() {
+  echo "Building static files"
+  STR=$(php ${WEB_ROOT}bin/magento deploy:mode:show)
+  SUB="developer"
+  if [[ "$STR" =~ .*"$SUB".* ]]; then
+    php ${WEB_ROOT}bin/magento dev:source-theme:deploy
+  else
+    php ${WEB_ROOT}bin/magento setup:static-content:deploy
+  fi
+}
+
+recompile (){
+  php ${WEB_ROOT}bin/magento s:up
+  php ${WEB_ROOT}bin/magento setup:di:compile
+  php ${WEB_ROOT}bin/magento indexer:reindex
+}
+
 # The script starts here
+cd $(dirname $(realpath ${BASH_SOURCE[0]}))
 load_config
 backup_local
 get_production_db
 import_db
 clean_up_env
 update_config
-
+build_static_files
+recompile
