@@ -28,7 +28,7 @@ function set_no_emails(){
 }
 
 function set_website_and_store_urls(){
-  php ${WEB_ROOT}bin/magento config:set --lock-env web/cookie/cookie_domain $
+  php ${WEB_ROOT}bin/magento config:set --lock-env web/cookie/cookie_domain ${MAINDOMAIN}
   ACC=0
   for CODE in "${STORES[@]}"
   do 
